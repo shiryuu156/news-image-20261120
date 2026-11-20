@@ -1,13 +1,16 @@
-// news-image-20261120 entry (Node 22, standard library only).
-// The image is drawn at build time by draw.mjs into entry.png (1024x1024,
-// under 1 MiB, fully deterministic). This program copies it to the output
-// directory the grader provides, so both graded runs write identical bytes.
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// news-image-20261120 entry point, written from scratch.
+// Copies the pre-rendered entry.png into the make.fun output directory.
+// Plain JavaScript in a .ts file (no type syntax), Node 22+ stdlib only.
 
-import { copyFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const HERE = dirname(fileURLToPath(import.meta.url));
+const outDir = process.env.MAKEFUN_OUTPUT_DIR || "/output";
+const source = join(HERE, "entry.png");
+const target = join(outDir, "entry.png");
+
 mkdirSync(outDir, { recursive: true });
-copyFileSync(new URL('./entry.png', import.meta.url), join(outDir, 'entry.png'));
+copyFileSync(source, target);
+console.log("copied entry.png to " + target);
